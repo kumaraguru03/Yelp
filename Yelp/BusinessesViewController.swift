@@ -8,11 +8,20 @@
 
 import UIKit
 
-class BusinessesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, FiltersViewControllerDelegate {
+class BusinessesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate,FiltersViewControllerDelegate {
 
     var businesses: [Business]!
     
     @IBOutlet weak var tableView: UITableView!
+
+    // Filter variables
+    var categories: [String]?
+    var deals = false
+    var radius:Int?
+    var sort : YelpSortMode?
+
+    let searchBar = UISearchBar()
+    var searchTerm: String?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -22,14 +31,13 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
         tableView.rowHeight = UITableViewAutomaticDimension
         tableView.estimatedRowHeight = 120
         
-        let searchBar = UISearchBar()
-        searchBar.sizeToFit()
+        self.searchBar.sizeToFit()
+        self.searchBar.delegate = self
 
-        navigationItem.titleView = searchBar
+        navigationItem.titleView = self.searchBar
         
         Business.searchWithTerm("Thai", completion: { (businesses: [Business]!, error: NSError!) -> Void in
             self.businesses = businesses
-            
             self.tableView.reloadData()
             
             for business in businesses {
@@ -77,9 +85,7 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
     
     func filtersViewController(filtersViewController: FiltersViewController, didUpdateFilters filters: [String : AnyObject]) {
         
-        let categories = filters["categories"] as? [String]
-        
-        var deals = false
+        categories = filters["categories"] as? [String]
         
         if (filters["deals"] != nil) {
             if (filters["deals"] as! String == "1") {
@@ -87,23 +93,20 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
             }
         }
         
-        var radius:Int?
-        
         if (filters["radius"] != nil) {
             radius = Int(filters["radius"] as! String)!
         }
         
-        var sort : YelpSortMode?
         if (filters["sort"] != nil) {
             let sortState = filters["sort"] as! String
         
             switch(sortState) {
-            case "1":
-                sort = YelpSortMode.Distance
-            case "2":
-                sort = YelpSortMode.HighestRated
-            default:
-                YelpSortMode.BestMatched
+                case "1":
+                    sort = YelpSortMode.Distance
+                case "2":
+                    sort = YelpSortMode.HighestRated
+                default:
+                    sort = YelpSortMode.BestMatched
             }
         }
         
@@ -120,6 +123,36 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
         }
     }
     
+    // Search Bar Delegate Methods
+    func searchBarShouldBeginEditing(searchBar: UISearchBar) -> Bool {
+        searchBar.setShowsCancelButton(true, animated: true)
+        return true;
+    }
+    
+    func searchBarShouldEndEditing(searchBar: UISearchBar) -> Bool {
+        searchBar.setShowsCancelButton(false, animated: true)
+        return true;
+    }
+    
+    func searchBarCancelButtonClicked(searchBar: UISearchBar) {
+        searchBar.text = ""
+        searchBar.resignFirstResponder()
+    }
+    
+    func searchBarSearchButtonClicked(searchBar: UISearchBar) {
+        self.searchTerm = searchBar.text!
+        searchBar.resignFirstResponder()
+        
+        print("searching for..." + searchTerm!)
+        
+        Business.searchWithTerm(searchTerm!, sort: sort, categories: categories, deals: deals, radius: radius) {
+            (businesses: [Business]!, error: NSError!) -> Void in
+            self.businesses = businesses
+            self.tableView.reloadData()
+        }
+    }
+    
+
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         // Get the new view controller using segue.destinationViewController.
@@ -129,8 +162,6 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
         filtersViewController.delegate = self
         
         // Pass the selected object to the new view controller.
-        
-        
     }
 
 }

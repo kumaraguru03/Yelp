@@ -36,7 +36,7 @@
                                                     </constraints>
                                                 </imageView>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="251" text="1. Grand Pu Bah" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Mp1-9M-lSt">
-                                                    <rect key="frame" x="88" y="4" width="180" height="18"/>
+                                                    <rect key="frame" x="88" y="4" width="115" height="18"/>
                                                     <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                                     <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                                     <nil key="highlightedColor"/>
@@ -83,7 +83,6 @@
                                                 <constraint firstItem="f11-8X-mAn" firstAttribute="top" secondItem="YU3-IU-gQu" secondAttribute="top" constant="8" id="4Ji-jU-5yE"/>
                                                 <constraint firstItem="Mp1-9M-lSt" firstAttribute="leading" secondItem="npY-RE-fKk" secondAttribute="trailing" constant="8" id="4Zo-9u-9ar"/>
                                                 <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="npY-RE-fKk" secondAttribute="bottom" constant="12" id="Gkb-Ai-vfz"/>
-                                                <constraint firstItem="f11-8X-mAn" firstAttribute="leading" secondItem="Mp1-9M-lSt" secondAttribute="trailing" constant="8" id="KEz-s5-4ZD"/>
                                                 <constraint firstAttribute="trailing" secondItem="f11-8X-mAn" secondAttribute="trailing" constant="8" id="UfH-XO-ZvX"/>
                                                 <constraint firstAttribute="trailing" secondItem="hWA-4p-VVJ" secondAttribute="trailing" constant="8" id="VhV-GS-KfK"/>
                                                 <constraint firstAttribute="trailing" secondItem="rHI-dT-13z" secondAttribute="trailing" constant="8" id="Vxp-Jq-NeF"/>

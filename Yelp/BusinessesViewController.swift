@@ -110,11 +110,6 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
             }
         }
         
-        print(categories)
-        print(deals)
-        print(radius)
-        print(sort)
-        
         Business.searchWithTerm("Restaurants", sort: sort, categories: categories, deals: deals, radius: radius) {
             (businesses: [Business]!, error: NSError!) -> Void in
             self.businesses = businesses
@@ -160,7 +155,7 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
         
         let filtersViewController = navigationController.topViewController as! FiltersViewController
         filtersViewController.delegate = self
-        
+
         // Pass the selected object to the new view controller.
     }
 

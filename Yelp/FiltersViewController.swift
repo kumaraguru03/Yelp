@@ -87,6 +87,11 @@ class FiltersViewController: UIViewController, UITableViewDataSource, UITableVie
         delegate?.filtersViewController?(self, didUpdateFilters: filters)
     }
     
+    func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        return titles[section]
+        
+    }
+    
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         switch(section){
         case 0:
@@ -148,12 +153,6 @@ class FiltersViewController: UIViewController, UITableViewDataSource, UITableVie
 
     }}
 
-    
-    func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return titles[section]
-    
-    }
-    
     /*
     // MARK: - Navigation
 
@@ -168,6 +167,21 @@ class FiltersViewController: UIViewController, UITableViewDataSource, UITableVie
         let indexPath = filterTableView.indexPathForCell(switchCell)!
         let sectionIndex = indexPath.section
         switchStates[sectionIndex]![indexPath.row] = value
+        
+        if (sectionIndex == 1) {
+            for (row, _) in switchStates[1]! {
+                if (row != indexPath.row) {
+                    switchStates[sectionIndex]![row] = false
+                }
+            }
+        }
+        if (sectionIndex == 2) {
+            for (row, _) in switchStates[2]! {
+                if (row != indexPath.row) {
+                    switchStates[sectionIndex]![row] = false
+                }
+            }
+        }
         print("value.." + "\(indexPath.section)" + "\(indexPath.row)" + "\(value)")
     }
 

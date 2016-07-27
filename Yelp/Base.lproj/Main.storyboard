@@ -113,6 +113,9 @@
                                     </tableViewCell>
                                 </prototypes>
                             </tableView>
+                            <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="nkX-dP-jAx">
+                                <rect key="frame" x="0.0" y="5" width="320" height="563"/>
+                            </mapView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
@@ -129,8 +132,14 @@
                                 <segue destination="wlm-u7-YC4" kind="modal" id="Gp9-uY-ktO"/>
                             </connections>
                         </barButtonItem>
+                        <barButtonItem key="rightBarButtonItem" title="Map" id="m1A-Yc-Gyf">
+                            <connections>
+                                <action selector="toggleMapAndListViews:" destination="2xI-yr-O5N" id="e2l-jY-sLR"/>
+                            </connections>
+                        </barButtonItem>
                     </navigationItem>
                     <connections>
+                        <outlet property="mapView" destination="nkX-dP-jAx" id="fzh-pf-Lck"/>
                         <outlet property="tableView" destination="dvF-7m-h4r" id="Tvq-Fz-PNF"/>
                     </connections>
                 </viewController>

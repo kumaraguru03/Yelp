@@ -7,11 +7,16 @@
 //
 
 import UIKit
+import MapKit
 
 class BusinessesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate,FiltersViewControllerDelegate {
 
+    let clatitude = 37.785771
+    let clongitude = -122.406165
+
     var businesses: [Business]!
     
+    @IBOutlet weak var mapView: MKMapView!
     @IBOutlet weak var tableView: UITableView!
 
     // Filter variables
@@ -23,6 +28,13 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
     let searchBar = UISearchBar()
     var searchTerm: String?
     
+    enum ViewMode: String {
+        case List = "List"
+        case Map = "Map"
+    }
+    
+    var currentView = ViewMode.List
+
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -31,20 +43,31 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
         tableView.rowHeight = UITableViewAutomaticDimension
         tableView.estimatedRowHeight = 120
         
+        mapView.hidden = true
+        
+        // Add search box in navigation bar
         self.searchBar.sizeToFit()
         self.searchBar.delegate = self
-
         navigationItem.titleView = self.searchBar
-        
+
+        // Perform initial search for Thai food
         Business.searchWithTerm("Thai", completion: { (businesses: [Business]!, error: NSError!) -> Void in
             self.businesses = businesses
             self.tableView.reloadData()
-            
+
+            // Pin the businesses in the map view
+            self.addAnnotationForBusinesses(self.businesses)
+
+            // Just printing
             for business in businesses {
                 print(business.name!)
                 print(business.address!)
             }
         })
+
+        // to Zoom the map to san francisco
+        goToLocation(CLLocation(latitude: clatitude, longitude: clongitude))
+
 
 /* Example of Yelp search with more search options specified
         Business.searchWithTerm("Restaurants", sort: .Distance, categories: ["asianfusion", "burgers"], deals: true) { (businesses: [Business]!, error: NSError!) -> Void in
@@ -56,6 +79,37 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
             }
         }
 */
+    }
+
+    func goToLocation(location: CLLocation) {
+        let span = MKCoordinateSpanMake(0.1, 0.1)
+        let region = MKCoordinateRegionMake(location.coordinate, span)
+        mapView.setRegion(region, animated: false)
+    }
+    
+    private func addAnnotationForBusinesses(businesses: [Business]) {
+        let annotationsToRemove = mapView.annotations.filter { $0 !== mapView.userLocation }
+        mapView.removeAnnotations(annotationsToRemove)
+        
+        for business in businesses {
+            let coordinate = CLLocationCoordinate2D(latitude: business.coordinate.latitude!, longitude: business.coordinate.longitude!)
+            
+            let annotation = MKPointAnnotation()
+            annotation.coordinate = coordinate
+            annotation.title = business.name
+            mapView.addAnnotation(annotation)
+        }
+        
+        zoomMapToFitAnnotationsForBusiness(businesses)
+    }
+    
+    private func zoomMapToFitAnnotationsForBusiness(businesses: [Business]) {
+        let rectToDisplay = self.businesses.reduce(MKMapRectNull) { (mapRect: MKMapRect, business: Business) -> MKMapRect in
+            let coordinate = CLLocationCoordinate2D(latitude: business.coordinate.latitude!, longitude: business.coordinate.longitude!)
+            let businessPointRect = MKMapRect(origin: MKMapPointForCoordinate(coordinate), size: MKMapSize(width: 0, height: 0))
+            return MKMapRectUnion(mapRect, businessPointRect)
+        }
+        self.mapView.setVisibleMapRect(rectToDisplay, edgePadding: UIEdgeInsetsMake(74, 20, 20, 20), animated: false)
     }
 
     
@@ -77,12 +131,43 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
         return businesses?.count ?? 0
     }
     
+    @IBAction func toggleMapAndListViews(sender: UIBarButtonItem) {
+        if currentView == .List {
+            currentView = .Map
+            UIView.transitionWithView(
+                view,
+                duration: 0.5,
+                options: [.TransitionFlipFromRight],
+                animations: {
+                    self.tableView.hidden = true
+                    self.mapView.hidden = false
+                },
+                completion: nil
+            )
+            sender.title = "List"
+        } else {
+            currentView = .List
+            UIView.transitionWithView(
+                view,
+                duration: 0.5,
+                options: [.TransitionFlipFromLeft],
+                animations: {
+                    self.tableView.hidden = false
+                    self.mapView.hidden = true
+                },
+                completion: nil
+            )
+            sender.title = "Map"
+        }
+
+    }
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
 
-    
+    // delegate method call
     func filtersViewController(filtersViewController: FiltersViewController, didUpdateFilters filters: [String : AnyObject]) {
         
         categories = filters["categories"] as? [String]
@@ -114,8 +199,9 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
             (businesses: [Business]!, error: NSError!) -> Void in
             self.businesses = businesses
             self.tableView.reloadData()
-            
+            self.addAnnotationForBusinesses(self.businesses)
         }
+
     }
     
     // Search Bar Delegate Methods
@@ -144,7 +230,9 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
             (businesses: [Business]!, error: NSError!) -> Void in
             self.businesses = businesses
             self.tableView.reloadData()
+            self.addAnnotationForBusinesses(self.businesses)
         }
+
     }
     
 
